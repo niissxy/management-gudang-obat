@@ -97,7 +97,7 @@ export default function Sidebar() {
               </ul>
             )}
           </li>
-          <li style={{ marginTop: '160px' }}>
+          <li style={{ marginTop: '50px' }}>
             <div>
             <p>{session.user?.name}</p>
             <p className='text-blue-300'>{session.user?.email}</p>

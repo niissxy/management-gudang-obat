@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function Page() {
 
   return (
-    <main className="flex">
+    <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
       <Sidebar />
 
@@ -17,7 +17,7 @@ export default function Page() {
           <div className="mb-4">
           </div>
           <div className="flex justify-end">
-            <Link href="/tambah-data">
+            <Link href="/obat/tambah-data">
             <button
             className="bg-blue-500 text-white px-4 py-2 rounded"
             style={{ marginRight: '100px' }}

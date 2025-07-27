@@ -4,7 +4,7 @@ const Home: React.FC = () => {
   return (
     <>
       <Sidebar />
-      <main>
+      <main className="flex min-h-screen bg-gray-100">
         <p></p>
       </main>
     </>

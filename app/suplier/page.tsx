@@ -8,7 +8,7 @@ import Sidebar from "@/app/components/Sidebar";
 export default function Page() {
 
   return (
-    <main className="flex">
+    <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
       <Sidebar />
 
