@@ -11,7 +11,7 @@ import {
   Warehouse,
   ChevronDown,
   ChevronUp,
-  LogOut
+  LogOut,
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 
@@ -97,7 +97,14 @@ export default function Sidebar() {
               </ul>
             )}
           </li>
-          <li style={{ marginTop: '20px' }}>
+          <li style={{ marginTop: '160px' }}>
+            <div>
+            <p>{session.user?.name}</p>
+            <p className='text-blue-300'>{session.user?.email}</p>
+            </div>
+          </li>
+
+          <li>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="flex items-center space-x-2 text-red-400 hover:text-red-700"
@@ -105,13 +112,6 @@ export default function Sidebar() {
               <LogOut size={18} />
               <span style={{ marginLeft: '5px' }}>Sign Out</span>
             </button>
-          </li>
-
-          <li style={{ marginTop: '165px' }}>
-            <div>
-            <p>{session.user?.name}</p>
-            <p className='text-blue-300'>{session.user?.email}</p>
-            </div>
           </li>
         </ul>
       </nav>
