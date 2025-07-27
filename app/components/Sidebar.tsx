@@ -27,7 +27,7 @@ export default function Sidebar() {
       <nav>
         <ul className="space-y-10">
           <li>
-            <Link href="/" className="flex items-center space-x-2 hover:text-gray-300">
+            <Link href="/home" className="flex items-center space-x-2 hover:text-gray-300">
               <Home size={18} />
               <span style={{ marginLeft: '11px' }}>Home</span>
             </Link>
