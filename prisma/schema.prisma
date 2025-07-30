@@ -21,3 +21,59 @@ model users {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model obat {
+  id_obat String @id @unique @default(cuid())
+  nama_obat String
+  stok Int
+  suplier String?
+  kategori String?
+  harga Int
+  exp_date DateTime
+}
+
+model kategori {
+  id_kategori String @id @unique @default(cuid())
+  nama_kategori String
+}
+
+model suplier {
+  id_suplier String @id @unique @default(cuid())
+  nama_suplier String
+  email_suplier String
+  alamat_suplier String?
+  no_telp String
+}
+
+model distribusi {
+  id_distribusi String @id @unique @default(cuid())
+  nama_obat String
+  stok Int
+  kategori String
+  tgl_distribusi DateTime
+  tujuan String
+}
+
+model gudang1 {
+  id_gudang String @id @unique @default(cuid())
+  id_distribusi String
+  stok Int
+  nama_obat String
+  tgl_distribusi DateTime
+}
+
+model gudang2 {
+  id_gudang String @id @unique @default(cuid())
+  id_distribusi String
+  stok Int
+  nama_obat String
+  tgl_distribusi DateTime
+}
+
+model gudang3 {
+  id_gudang String @id @unique @default(cuid())
+  id_distribusi String
+  stok Int
+  nama_obat String
+  tgl_distribusi DateTime
+}

@@ -2,6 +2,7 @@
 
 import Card from "@/app/components/cards";
 import Sidebar from "@/app/components/Sidebar";
+import Link from "next/link";
 
 export default function Page() {
 
@@ -15,6 +16,16 @@ export default function Page() {
         <Card title="Gudang 1">
           <div className="mb-4">
           </div>
+          <div className="flex justify-end">
+            <Link href="/gudang/1/tambah-data">
+            <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            style={{ marginRight: '100px' }}
+          >
+            Tambah Data
+          </button>
+            </Link>
+          </div>
 
           <div className="table-container">
             <table>
@@ -24,6 +35,7 @@ export default function Page() {
                   <th style={{ textAlign: 'center' }}>ID Distribusi</th>
                   <th style={{ textAlign: 'center' }}>Stok</th>
                   <th style={{ textAlign: 'center' }}>Nama Obat</th>
+                  <th style={{ textAlign: 'center' }}>Kategori</th>
                   <th colSpan={2} style={{ textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>

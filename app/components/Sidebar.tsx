@@ -75,11 +75,6 @@ export default function Sidebar() {
             {openGudang && (
               <ul className="ml-8 mt-2 space-y-2">
                 <li>
-                  <Link href="/gudang/utama" className="hover:text-gray-300">
-                    Gudang Utama
-                  </Link>
-                </li>
-                <li>
                   <Link href="/gudang/1" className="hover:text-gray-300">
                     Gudang 1
                   </Link>

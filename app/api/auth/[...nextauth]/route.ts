@@ -19,7 +19,7 @@ const handler = NextAuth({
         const user = await prisma.users.findUnique({
           where: { email: credentials.email }
         });
-
+        
         if (!user) return null;
 
         const isValid = await compare(credentials.password, user.password);

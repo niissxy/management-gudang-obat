@@ -2,6 +2,7 @@
 
 import Card from "../components/cards";
 import Sidebar from "@/app/components/Sidebar";
+import Link from "next/link";
 
 export default function Page() {
 
@@ -13,6 +14,16 @@ export default function Page() {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Daftar Kategori Obat">
+          <div className="flex justify-end">
+            <Link href="/kategori/tambah-data">
+            <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            style={{ marginRight: '100px' }}
+          >
+            Tambah Data
+          </button>
+            </Link>
+          </div>
           <div className="mb-4">
           </div>
 
