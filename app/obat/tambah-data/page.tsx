@@ -17,6 +17,9 @@ interface Obat {
 }
 
 export default function TambahDataObat() {
+  const [listSuplier, setListSuplier] = useState<string[]>([]);
+  const [listKategori, setListKategori] = useState<string[]>([]);
+
   const [obat, setObat] = useState<Obat[]>([]);
   const [nama_obat, setNamaObat] = useState('');
   const [stok, setStok] = useState('');
@@ -28,11 +31,29 @@ export default function TambahDataObat() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/obat')
-      .then(response => response.json())
-      .then(data => setObat(data))
-      .catch(error => console.error('Error fetching obat:', error));
-  }, []);
+  // Ambil data obat (opsional)
+  fetch('/api/obat')
+    .then(response => response.json())
+    .then(data => setObat(data))
+    .catch(error => console.error('Error fetching obat:', error));
+
+  // Ambil daftar suplier
+  fetch('/api/suplier')
+    .then(res => res.json())
+    .then(data => {
+      const suplierNames = data.map((s: any) => s.nama_suplier);
+      setListSuplier(suplierNames);
+    });
+
+  // Ambil daftar kategori
+  fetch('/api/kategori')
+    .then(res => res.json())
+    .then(data => {
+      const kategoriNames = data.map((k: any) => k.nama_kategori);
+      setListKategori(kategoriNames);
+    });
+}, []);
+
 
  const addDataObat = async () => {
   const response = await fetch('/api/obat', {
@@ -42,7 +63,7 @@ export default function TambahDataObat() {
   });
 
   if (response.ok) {
-    router.push('/obat'); // ✅ Arahkan ke halaman /obat setelah sukses
+    router.push('/obat');
   } else {
     const err = await response.json();
     console.error('Gagal menambahkan data:', err);
@@ -77,23 +98,31 @@ export default function TambahDataObat() {
         </div>
         <div style={{ marginTop: '10px' }}>
           <p className="text-black my-2">Suplier</p>
-          <input
-            className="border p-2 mr-2"
-            style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '500px' }}
-            placeholder="masukkan suplier obat..."
+          <select
+            className="border p-2 rounded w-[500px] text-black"
             value={suplier}
             onChange={(e) => setSuplier(e.target.value)}
-          />
+          >
+           <option value="">Pilih Suplier</option>
+            {listSuplier.map((s, i) => (
+           <option key={i} value={s}>{s}</option>
+             ))}
+          </select>
+
         </div>
         <div style={{ marginTop: '10px' }}>
           <p className="text-black my-2">Kategori</p>
-          <input
-            className="border p-2 mr-2"
-            style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '500px' }}
-            placeholder="masukkan kategori..."
+          <select
+            className="border p-2 rounded w-[500px] text-black"
             value={kategori}
             onChange={(e) => setKategori(e.target.value)}
-          />
+          >
+          <option value="">Pilih Kategori</option>
+            {listKategori.map((s, i) => (
+          <option key={i} value={s}>{s}</option>
+          ))}
+          </select>
+
         </div>
          <div style={{ marginTop: '10px' }}>
           <p className="text-black my-2">Harga Obat</p>

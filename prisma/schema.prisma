@@ -47,6 +47,7 @@ model suplier {
 
 model distribusi {
   id_distribusi String @id @unique @default(cuid())
+  id_obat String 
   nama_obat String
   stok Int
   kategori String
@@ -57,23 +58,26 @@ model distribusi {
 model gudang1 {
   id_gudang String @id @unique @default(cuid())
   id_distribusi String
+  id_obat String
   stok Int
   nama_obat String
-  tgl_distribusi DateTime
+  kategori String
 }
 
 model gudang2 {
   id_gudang String @id @unique @default(cuid())
   id_distribusi String
+  id_obat String
   stok Int
   nama_obat String
-  tgl_distribusi DateTime
+  kategori String
 }
 
 model gudang3 {
   id_gudang String @id @unique @default(cuid())
+  id_obat String
   id_distribusi String
   stok Int
   nama_obat String
-  tgl_distribusi DateTime
+  kategori String
 }

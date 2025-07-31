@@ -3,8 +3,32 @@
 import Card from "../components/cards";
 import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function Page() {
+  interface Kategori {
+      id_kategori: string;
+      nama_kategori: string;
+    }
+  
+      const [kategoriList, setKategoriList] = useState<Kategori[]>([]);
+      const [loading, setLoading] = useState(true);
+    
+      useEffect(() => {
+        const fetchKategori = async () => {
+          try {
+            const res = await fetch("/api/kategori");
+            const data = await res.json();
+            setKategoriList(data);
+          } catch (err) {
+            console.error("Gagal mengambil data kategori:", err);
+          } finally {
+            setLoading(false);
+          }
+        };
+    
+        fetchKategori();
+      }, []);
 
   return (
     <main className="flex min-h-screen bg-gray-100">
@@ -28,6 +52,9 @@ export default function Page() {
           </div>
 
           <div className="table-container">
+            {loading ? (
+              <p className="text-black">Loading...</p>
+            ) : (
             <table>
               <thead>
                 <tr>
@@ -37,9 +64,24 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
+                {kategoriList.map((kategori) => (
+                    <tr key={kategori.id_kategori}>
+                      <td style={{ textAlign: 'center' }}>{kategori.id_kategori}</td>
+                      <td style={{ textAlign: 'center' }}>{kategori.nama_kategori}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        <Link href={`/kategori/edit/${kategori.id_kategori}`}>
+                          <button className="text-blue-500">Edit</button>
+                        </Link>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button className="text-red-500">Hapus</button>
+                      </td>
+                    </tr>
+                  ))}
 
               </tbody>
             </table>
+            )};
           </div>
 
           <style jsx>{`

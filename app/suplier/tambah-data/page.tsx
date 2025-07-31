@@ -37,7 +37,7 @@ export default function TambahDataSuplier() {
     });
   
     if (response.ok) {
-      router.push('/suplier'); // ✅ Arahkan ke halaman /obat setelah sukses
+      router.push('/suplier');
     } else {
       const err = await response.json();
       console.error('Gagal menambahkan data:', err);

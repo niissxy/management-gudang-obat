@@ -55,7 +55,7 @@ export default function Page() {
           </div>
           <div className="table-container">
             {loading ? (
-              <p>Loading...</p>
+              <p className="text-black">Loading...</p>
             ) : (
               <table>
                 <thead>

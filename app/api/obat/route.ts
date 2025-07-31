@@ -70,24 +70,40 @@ export async function PATCH(request: NextRequest) {
   });
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { id_obat } = body;
+    const body = await req.json();
+    const { id } = body;
 
-    // Pastikan ID ada
-    if (!id_obat) {
-      return NextResponse.json({ error: 'ID wajib diisi' }, { status: 400 });
-    }
-
-    // Hapus data secara permanen
-    await prisma.obat.delete({
-      where: { id_obat: String(id_obat) },
+    // Cari obat berdasarkan ID
+    const obat = await prisma.obat.findUnique({
+      where: { id_obat: id },
     });
 
-    return NextResponse.json({ message: 'Data Obat berhasil dihapus' }, { status: 200 });
+    if (!obat) {
+      return NextResponse.json({ error: "Obat tidak ditemukan." }, { status: 404 });
+    }
+
+    // Cek apakah obat sudah digunakan dalam distribusi
+    const digunakan = await prisma.distribusi.findFirst({
+      where: { nama_obat: obat.nama_obat }, // atau pakai id_obat kalau pakai foreign key
+    });
+
+    if (digunakan) {
+      return NextResponse.json(
+        { error: "Obat tidak bisa dihapus karena sudah digunakan dalam distribusi." },
+        { status: 400 }
+      );
+    }
+
+    // Jika belum digunakan, lanjut hapus
+    await prisma.obat.delete({
+      where: { id_obat: id },
+    });
+
+    return NextResponse.json({ message: "Obat berhasil dihapus." });
   } catch (error) {
-    console.error('Gagal menghapus data obat:', error);
-    return NextResponse.json({ error: 'Terjadi kesalahan saat menghapus' }, { status: 500 });
+    console.error("Gagal menghapus obat:", error);
+    return NextResponse.json({ error: "Terjadi kesalahan saat menghapus." }, { status: 500 });
   }
 }

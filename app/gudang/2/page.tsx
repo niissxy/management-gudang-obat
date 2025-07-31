@@ -3,8 +3,37 @@
 import Card from "@/app/components/cards";
 import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function Page() {
+  interface Gudang2 {
+    id_gudang: string;
+    id_distribusi: string;
+    id_obat: string;
+    stok: number;
+    nama_obat: string,
+    tgl_distribusi: string;
+    kategori: string;
+  }
+
+  const [gudang2List, setGudang2List] = useState<Gudang2[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=> {
+    const fetchGudang2 = async() => {
+      try {
+          const res = await fetch("/api/gudang/2");
+          const data = await res.json();
+          setGudang2List(data);
+        } catch (err) {
+          console.error("Gagal mengambil data gudang 2:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchGudang2();
+    }, []);
 
   return (
     <main className="flex min-h-screen bg-gray-100">
@@ -14,8 +43,6 @@ export default function Page() {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Gudang 2">
-          <div className="mb-4">
-          </div>
           <div className="mb-4">
           </div>
           <div className="flex justify-end">
@@ -30,21 +57,45 @@ export default function Page() {
           </div>
 
           <div className="table-container">
+            {loading ? (
+              <p className="text-black">Loading...</p>
+            ) : (
             <table>
               <thead>
                 <tr>
                   <th style={{ textAlign: 'center' }}>ID Gudang</th>
                   <th style={{ textAlign: 'center' }}>ID Distribusi</th>
+                  <th style={{ textAlign: 'center' }}>ID Obat</th>
                   <th style={{ textAlign: 'center' }}>Stok</th>
                   <th style={{ textAlign: 'center' }}>Nama Obat</th>
+                  <th style={{ textAlign: 'center' }}>Tanggal Distribusi</th>
                   <th style={{ textAlign: 'center' }}>Kategori</th>
                   <th colSpan={2} style={{ textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
-
+                {gudang2List.map((gudang2) => (
+                    <tr key={gudang2.id_gudang}>
+                      <td style={{ textAlign: 'center' }}>{gudang2.id_gudang}</td>
+                      <td style={{ textAlign: 'center' }}>{gudang2.id_distribusi}</td>
+                      <td style={{ textAlign: 'center' }}>{gudang2.id_obat}</td>
+                      <td style={{ textAlign: 'center' }}>{gudang2.stok}</td>
+                      <td style={{ textAlign: 'center' }}>{gudang2.nama_obat}</td>
+                      <td style={{ textAlign: 'center' }}>{new Date(gudang2.tgl_distribusi).toLocaleDateString("id-ID")}</td>
+                      <td style={{ textAlign: 'center' }}>{gudang2.kategori}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        <Link href={`/gudang/2/edit/${gudang2.id_gudang}`}>
+                          <button className="text-blue-500">Edit</button>
+                        </Link>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button className="text-red-500">Hapus</button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
+            )}
           </div>
 
           <style jsx>{`
