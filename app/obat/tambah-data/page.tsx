@@ -111,7 +111,7 @@ export default function TambahDataObat() {
 
         </div>
         <div style={{ marginTop: '10px' }}>
-          <p className="text-black my-2">Kategori</p>
+          <p className="text-black my-2">Kategori Obat</p>
           <select
             className="border p-2 rounded w-[500px] text-black"
             value={kategori}
