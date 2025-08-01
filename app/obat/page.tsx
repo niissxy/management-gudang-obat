@@ -96,7 +96,7 @@ export default function Page() {
 
     if (res.ok) {
       // Hapus dari state tanpa refresh
-      setObat(prev => prev.filter(item => item.id_obat !== id_obat));
+      setObatList(prev => prev.filter(item => item.id_obat !== id_obat));
     } else {
       alert(result.error || "Gagal menghapus");
     }
