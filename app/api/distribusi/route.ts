@@ -127,7 +127,6 @@ export async function PATCH(request: NextRequest) {
           nama_obat,
           kategori,
           tujuan,
-          tgl_distribusi: new Date(tgl_distribusi),
         },
       });
 
