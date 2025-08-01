@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Pen, TrashIcon } from "lucide-react";
 
 export default function Page() {
   interface Gudang2 {
@@ -12,12 +13,18 @@ export default function Page() {
     id_obat: string;
     stok: number;
     nama_obat: string,
-    tgl_distribusi: string;
     kategori: string;
   }
 
   const [gudang2List, setGudang2List] = useState<Gudang2[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [editingIdGudang2, setEditingIdGudang2] = useState<string | null>(null);
+  const [editIdDistribusi, setEditIdDistribusi] = useState('');
+  const [editIdObat, setEditIdObat] = useState('');
+  const [editStok, setEditStok] = useState('');
+  const [editNamaObat, setEditNamaObat] = useState('');
+  const [editKategori, setEditKategori] = useState('');
 
   useEffect(()=> {
     const fetchGudang2 = async() => {
@@ -34,6 +41,42 @@ export default function Page() {
   
       fetchGudang2();
     }, []);
+
+    const startEdit = (g2: Gudang2) => {
+    setEditingIdGudang2(g2.id_gudang);
+    setEditIdDistribusi(g2.id_distribusi);
+    setEditIdObat(g2.id_obat);
+    setEditStok(g2.stok.toString());
+    setEditNamaObat(g2.nama_obat);
+    setEditKategori(g2.kategori);
+  };
+
+  const saveEdit = async () => {
+  if (!editingIdGudang2) return;
+
+  const response = await fetch('/api/gudang/2', {
+    method: 'PATCH',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_gudang: editingIdGudang2,
+      id_distribusi: editIdDistribusi,
+      id_obat: editIdObat,
+      stok: editStok,
+      nama_obat: editNamaObat,
+      kategori: editKategori,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    alert(errorData.error || "Gagal update data");
+    return;
+  }
+
+  const updated = await response.json();
+  setGudang2List(prev => prev.map(g2 => g2.id_gudang === editingIdGudang2 ? updated : g2));
+  setEditingIdGudang2(null);
+};
 
   return (
     <main className="flex min-h-screen bg-gray-100">
@@ -68,33 +111,103 @@ export default function Page() {
                   <th style={{ textAlign: 'center' }}>ID Obat</th>
                   <th style={{ textAlign: 'center' }}>Stok</th>
                   <th style={{ textAlign: 'center' }}>Nama Obat</th>
-                  <th style={{ textAlign: 'center' }}>Tanggal Distribusi</th>
                   <th style={{ textAlign: 'center' }}>Kategori</th>
                   <th colSpan={2} style={{ textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {gudang2List.map((gudang2) => (
-                    <tr key={gudang2.id_gudang}>
-                      <td style={{ textAlign: 'center' }}>{gudang2.id_gudang}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang2.id_distribusi}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang2.id_obat}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang2.stok}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang2.nama_obat}</td>
-                      <td style={{ textAlign: 'center' }}>{new Date(gudang2.tgl_distribusi).toLocaleDateString("id-ID")}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang2.kategori}</td>
-                      <td style={{ textAlign: 'center' }}>
-                        <Link href={`/gudang/2/edit/${gudang2.id_gudang}`}>
-                          <button className="text-blue-500">Edit</button>
-                        </Link>
+                {gudang2List.length > 0 ? gudang2List.map((g2) => (
+                <tr key={g2.id_gudang}>
+                  {editingIdGudang2 === g2.id_gudang ? (
+                    <>
+                      <td>{g2.id_gudang}</td>
+
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editIdDistribusi} 
+                      readOnly={true}
+                      onChange={(e) => setEditIdDistribusi(e.target.value)} /></td>
+                      
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editIdObat} 
+                      readOnly={true}
+                      onChange={(e) => setEditIdObat(e.target.value)} /></td>
+
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}                      
+                      value={editStok} 
+                      onChange={(e) => setEditStok(e.target.value)} /></td>
+
+                       <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editNamaObat} 
+                      readOnly={true}
+                      onChange={(e) => setEditNamaObat(e.target.value)} /></td>
+
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}                      
+                      value={editKategori} 
+                      readOnly={true}
+                      onChange={(e) => setEditKategori(e.target.value)} /></td>
+
+                      <td style={{ width: '120px' }}>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={saveEdit}
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                          >
+                            Simpan
+                          </button>
+                          <button
+                            onClick={() => setEditingIdGudang2(null)}
+                            className="bg-gray-400 text-white px-3 py-1 rounded"
+                          >
+                          Batal
+                        </button>
+                        </div>
                       </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <button className="text-red-500">Hapus</button>
+
+                    </>
+                  ) : (
+                    <>
+                      <td>{g2.id_gudang}</td>
+                      <td>{g2.id_distribusi}</td>
+                      <td>{g2.id_obat}</td>
+                      <td>{g2.stok}</td>
+                      <td>{g2.nama_obat}</td>
+                      <td>{g2.kategori}</td>
+                      <td colSpan={2}>
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => startEdit(g2)}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2"
+                          >
+                            <Pen size={18} />
+                          </button>
+                          <button
+                            onClick={() => deleteBarang(o.id_obat)}
+                            className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2"
+                          >
+                            <TrashIcon size={18} />
+                          </button>
+                          </div>
                       </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                    </>
+                  )}
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center' }}>Data Gudang 2 tidak ditemukan</td>
+                </tr>
+              )}
+                </tbody>
+              </table>
             )}
           </div>
 

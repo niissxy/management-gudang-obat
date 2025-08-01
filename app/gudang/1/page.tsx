@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Pen, TrashIcon } from "lucide-react";
 
 export default function Page() {
   interface Gudang1 {
@@ -12,12 +13,18 @@ export default function Page() {
     id_obat: string;
     stok: number;
     nama_obat: string,
-    tgl_distribusi: string;
     kategori: string;
   }
 
   const [gudang1List, setGudang1List] = useState<Gudang1[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [editingIdGudang1, setEditingIdGudang1] = useState<string | null>(null);
+  const [editIdDistribusi, setEditIdDistribusi] = useState('');
+  const [editIdObat, setEditIdObat] = useState('');
+  const [editStok, setEditStok] = useState('');
+  const [editNamaObat, setEditNamaObat] = useState('');
+  const [editKategori, setEditKategori] = useState('');
 
   useEffect(()=> {
     const fetchGudang1 = async() => {
@@ -34,6 +41,42 @@ export default function Page() {
   
       fetchGudang1();
     }, []);
+
+    const startEdit = (g1: Gudang1) => {
+    setEditingIdGudang1(g1.id_gudang);
+    setEditIdDistribusi(g1.id_distribusi);
+    setEditIdObat(g1.id_obat);
+    setEditStok(g1.stok.toString());
+    setEditNamaObat(g1.nama_obat);
+    setEditKategori(g1.kategori);
+  };
+
+  const saveEdit = async () => {
+  if (!editingIdGudang1) return;
+
+  const response = await fetch('/api/gudang/1', {
+    method: 'PATCH',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_gudang: editingIdGudang1,
+      id_distribusi: editIdDistribusi,
+      id_obat: editIdObat,
+      stok: editStok,
+      nama_obat: editNamaObat,
+      kategori: editKategori,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    alert(errorData.error || "Gagal update data");
+    return;
+  }
+
+  const updated = await response.json();
+  setGudang1List(prev => prev.map(g1 => g1.id_gudang === editingIdGudang1 ? updated : g1));
+  setEditingIdGudang1(null);
+};
 
   return (
     <main className="flex min-h-screen bg-gray-100">
@@ -73,26 +116,98 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {gudang1List.map((gudang1) => (
-                    <tr key={gudang1.id_gudang}>
-                      <td style={{ textAlign: 'center' }}>{gudang1.id_gudang}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang1.id_distribusi}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang1.id_obat}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang1.stok}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang1.nama_obat}</td>
-                      <td style={{ textAlign: 'center' }}>{gudang1.kategori}</td>
-                      <td style={{ textAlign: 'center' }}>
-                        <Link href={`/gudang/1/edit/${gudang1.id_gudang}`}>
-                          <button className="text-blue-500">Edit</button>
-                        </Link>
+                {gudang1List.length > 0 ? gudang1List.map((g1) => (
+                <tr key={g1.id_gudang}>
+                  {editingIdGudang1 === g1.id_gudang ? (
+                    <>
+                      <td>{g1.id_gudang}</td>
+
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editIdDistribusi} 
+                      readOnly={true}
+                      onChange={(e) => setEditIdDistribusi(e.target.value)} /></td>
+                      
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editIdObat} 
+                      readOnly={true}
+                      onChange={(e) => setEditIdObat(e.target.value)} /></td>
+
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}                      
+                      value={editStok} 
+                      onChange={(e) => setEditStok(e.target.value)} /></td>
+
+                       <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editNamaObat} 
+                      readOnly={true}
+                      onChange={(e) => setEditNamaObat(e.target.value)} /></td>
+
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}                      
+                      value={editKategori} 
+                      readOnly={true}
+                      onChange={(e) => setEditKategori(e.target.value)} /></td>
+
+                      <td style={{ width: '120px' }}>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={saveEdit}
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                          >
+                            Simpan
+                          </button>
+                          <button
+                            onClick={() => setEditingIdGudang1(null)}
+                            className="bg-gray-400 text-white px-3 py-1 rounded"
+                          >
+                          Batal
+                        </button>
+                        </div>
                       </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <button className="text-red-500">Hapus</button>
+
+                    </>
+                  ) : (
+                    <>
+                      <td>{g1.id_gudang}</td>
+                      <td>{g1.id_distribusi}</td>
+                      <td>{g1.id_obat}</td>
+                      <td>{g1.stok}</td>
+                      <td>{g1.nama_obat}</td>
+                      <td>{g1.kategori}</td>
+                      <td colSpan={2}>
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => startEdit(g1)}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2"
+                          >
+                            <Pen size={18} />
+                          </button>
+                          <button
+                            onClick={() => deleteBarang(o.id_obat)}
+                            className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2"
+                          >
+                            <TrashIcon size={18} />
+                          </button>
+                          </div>
                       </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                    </>
+                  )}
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center' }}>Data Gudang 1 tidak ditemukan</td>
+                </tr>
+              )}
+                </tbody>
+              </table>
             )}
           </div>
 

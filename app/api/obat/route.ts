@@ -5,12 +5,17 @@ import { generateNextObatId } from "@/lib/generatedId";
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
-  const obat = await prisma.obat.findMany();
+  const obat = await prisma.obat.findMany({
+    orderBy: {
+      id_obat: 'asc', 
+    },
+  });
   return NextResponse.json(obat, {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,16 +58,29 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const { id_obat, nama_obat, stok, suplier, kategori, harga, exp_date } = body;
 
+  // 1. Ambil stok lama
+  const obatLama = await prisma.obat.findUnique({
+    where: { id_obat },
+  });
+
+  if (!obatLama) {
+    return NextResponse.json({ error: 'Obat tidak ditemukan' }, { status: 404 });
+  }
+
+  // 2. Tambahkan stok lama + stok baru
+  const stokBaru = obatLama.stok + parseInt(stok);
+
+  // 3. Update data
   const updateDataObat = await prisma.obat.update({
     where: { id_obat },
     data: {
       nama_obat,
-      stok: parseInt(stok),
+      stok: stokBaru,
       suplier,
       kategori,
       harga: parseFloat(harga),
-      exp_date: new Date(exp_date) // Ensure exp_date is a Date object
-    }
+      exp_date: new Date(exp_date),
+    },
   });
 
   return NextResponse.json(updateDataObat, {
@@ -84,16 +102,27 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Obat tidak ditemukan." }, { status: 404 });
     }
 
-    // Cek apakah obat sudah digunakan dalam distribusi
-    const digunakan = await prisma.distribusi.findFirst({
-      where: { nama_obat: obat.nama_obat }, // atau pakai id_obat kalau pakai foreign key
+    // Cek apakah obat sudah digunakan di distribusi
+    const digunakanDistribusi = await prisma.distribusi.findFirst({
+      where: { id_obat: id },
     });
 
-    if (digunakan) {
-      return NextResponse.json(
-        { error: "Obat tidak bisa dihapus karena sudah digunakan dalam distribusi." },
-        { status: 400 }
-      );
+    const digunakanGudang1 = await prisma.gudang1.findFirst({
+      where: { id_obat: id },
+    });
+
+    const digunakanGudang2 = await prisma.gudang2.findFirst({
+      where: { id_obat: id },
+    });
+
+    const digunakanGudang3 = await prisma.gudang3.findFirst({
+      where: { id_obat: id },
+    });
+
+    if (digunakanDistribusi || digunakanGudang1 || digunakanGudang2 || digunakanGudang3) {
+      return NextResponse.json({
+        error: "Obat tidak bisa dihapus karena sudah digunakan di distribusi atau gudang.",
+      }, { status: 400 });
     }
 
     // Jika belum digunakan, lanjut hapus

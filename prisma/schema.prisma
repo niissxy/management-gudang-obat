@@ -61,6 +61,7 @@ model gudang1 {
   id_obat String
   stok Int
   nama_obat String
+  tgl_distribusi DateTime
   kategori String
 }
 
@@ -70,6 +71,7 @@ model gudang2 {
   id_obat String
   stok Int
   nama_obat String
+  tgl_distribusi DateTime
   kategori String
 }
 
@@ -79,5 +81,6 @@ model gudang3 {
   id_distribusi String
   stok Int
   nama_obat String
+  tgl_distribusi String
   kategori String
 }

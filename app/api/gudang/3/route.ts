@@ -5,7 +5,11 @@ import { generateNextGudang3Id } from "@/lib/generatedId";
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
-  const gudang3 = await prisma.gudang3.findMany();
+ const gudang3 = await prisma.gudang3.findMany({
+    orderBy: {
+      id_gudang: 'asc', 
+    },
+  });
   return NextResponse.json(gudang3, {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
@@ -67,23 +71,61 @@ export async function POST(request: NextRequest) {
 
 
 export async function PATCH(request: NextRequest) {
-  const body = await request.json();
-  const { id_gudang, id_distribusi, id_obat, stok, nama_obat, kategori } = body;
+  try {
+    const body = await request.json();
+    const { id_gudang, id_distribusi, id_obat, stok, nama_obat, kategori } = body;
 
-  const updateDataGudang3 = await prisma.gudang3.update({
-    where: { id_gudang },
-    data: {
-      id_distribusi,
-      id_obat,
-      stok: parseInt(stok),
-      nama_obat,
-      kategori,
+    const jumlahBaru = parseInt(stok);
+
+    const gudangLama = await prisma.gudang3.findUnique({
+      where: { id_gudang },
+    });
+
+    if (!gudangLama) {
+      return NextResponse.json({ error: "Data gudang 3 tidak ditemukan" }, { status: 404 });
     }
-  });
 
-  return NextResponse.json(updateDataGudang3, {
-    status: 200,
-  });
+    const distribusi = await prisma.distribusi.findUnique({
+      where: { id_distribusi },
+    });
+
+    if (!distribusi) {
+      return NextResponse.json({ error: "Distribusi tidak ditemukan" }, { status: 404 });
+    }
+
+    if (distribusi.stok < jumlahBaru) {
+      return NextResponse.json({ error: "Stok distribusi tidak mencukupi" }, { status: 400 });
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      // Update Gudang1: stok lama + stok baru
+      const gudangUpdate = await tx.gudang3.update({
+        where: { id_gudang },
+        data: {
+          id_distribusi,
+          id_obat,
+          stok: gudangLama.stok + jumlahBaru,
+          nama_obat,
+          kategori,
+        },
+      });
+
+      // Update Distribusi: kurangi stok
+      await tx.distribusi.update({
+        where: { id_distribusi },
+        data: {
+          stok: distribusi.stok - jumlahBaru,
+        },
+      });
+
+      return gudangUpdate;
+    });
+
+    return NextResponse.json(updated, { status: 200 });
+  } catch (error) {
+    console.error("Gagal update gudang 3:", error);
+    return NextResponse.json({ error: "Gagal update data gudang 3" }, { status: 500 });
+  }
 }
 
 export async function DELETE(request: NextRequest) {

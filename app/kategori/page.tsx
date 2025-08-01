@@ -4,6 +4,7 @@ import Card from "../components/cards";
 import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { Pen } from "lucide-react";
 
 export default function Page() {
   interface Kategori {
@@ -14,6 +15,9 @@ export default function Page() {
       const [kategoriList, setKategoriList] = useState<Kategori[]>([]);
       const [loading, setLoading] = useState(true);
     
+      const [editingIdKategori, setEditingIdKategori] = useState<string | null>(null);
+      const [editNamaKategori, setEditNamaKategori] = useState('');
+
       useEffect(() => {
         const fetchKategori = async () => {
           try {
@@ -29,6 +33,34 @@ export default function Page() {
     
         fetchKategori();
       }, []);
+
+       const startEdit = (k: Kategori) => {
+       setEditingIdKategori(k.id_kategori);
+       setEditNamaKategori(k.nama_kategori);
+  };
+
+  const saveEdit = async () => {
+  if (!editingIdKategori) return;
+
+  const response = await fetch('/api/kategori', {
+    method: 'PATCH',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_kategori: editingIdKategori,
+      nama_kategori: editNamaKategori,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    alert(errorData.error || "Gagal update data");
+    return;
+  }
+
+  const updated = await response.json();
+  setKategoriList(prev => prev.map(k => k.id_kategori === editingIdKategori ? updated : k));
+  setEditingIdKategori(null);
+};
 
   return (
     <main className="flex min-h-screen bg-gray-100">
@@ -64,24 +96,61 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {kategoriList.map((kategori) => (
-                    <tr key={kategori.id_kategori}>
-                      <td style={{ textAlign: 'center' }}>{kategori.id_kategori}</td>
-                      <td style={{ textAlign: 'center' }}>{kategori.nama_kategori}</td>
-                      <td style={{ textAlign: 'center' }}>
-                        <Link href={`/kategori/edit/${kategori.id_kategori}`}>
-                          <button className="text-blue-500">Edit</button>
-                        </Link>
+                {kategoriList.length > 0 ? kategoriList.map((k) => (
+                <tr key={k.id_kategori}>
+                  {editingIdKategori === k.id_kategori ? (
+                    <>
+                      <td>{k.id_kategori}</td>
+                      
+                      <td><input 
+                      className="border p-2 mr-2"
+                      style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
+                      value={editNamaKategori} 
+                      onChange={(e) => setEditNamaKategori(e.target.value)} /></td>
+                      
+                      <td style={{ width: '120px' }}>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={saveEdit}
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                          >
+                            Simpan
+                          </button>
+                          <button
+                            onClick={() => setEditingIdKategori(null)}
+                            className="bg-gray-400 text-white px-3 py-1 rounded"
+                          >
+                          Batal
+                        </button>
+                        </div>
                       </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <button className="text-red-500">Hapus</button>
-                      </td>
-                    </tr>
-                  ))}
 
-              </tbody>
-            </table>
-            )};
+                    </>
+                  ) : (
+                    <>
+                      <td>{k.id_kategori}</td>
+                      <td>{k.nama_kategori}</td>
+                      <td colSpan={2}>
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => startEdit(k)}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2"
+                          >
+                            <Pen size={18} />
+                          </button>
+                          </div>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center' }}>Data kategori tidak ditemukan</td>
+                </tr>
+              )}
+                </tbody>
+              </table>
+            )}
           </div>
 
           <style jsx>{`

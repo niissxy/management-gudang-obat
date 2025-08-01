@@ -5,7 +5,11 @@ import { generateNextKategoriId } from "@/lib/generatedId";
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
-  const kategori = await prisma.kategori.findMany();
+  const kategori = await prisma.kategori.findMany({
+    orderBy: {
+      id_kategori: 'asc', 
+    },
+  });
   return NextResponse.json(kategori, {
     status: 200,
     headers: { 'Content-Type': 'application/json' },

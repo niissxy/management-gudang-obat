@@ -100,7 +100,7 @@ export default function TambahDataGudang1() {
             <option value="">-- Pilih Distribusi --</option>
             {distribusiList.map((d, i) => (
               <option key={i} value={d.id_distribusi}>
-                {d.id_distribusi} - {d.nama_obat} (Stok: {d.stok})
+                {d.id_distribusi} - {d.nama_obat} (Stok: {d.stok}) (Tujuan: {d.tujuan})
               </option>
             ))}
           </select>

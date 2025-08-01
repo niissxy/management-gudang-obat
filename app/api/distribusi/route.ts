@@ -12,7 +12,11 @@ export async function GET(request: NextRequest) {
     }
   })
 
-  const distribusi = await prisma.distribusi.findMany();
+  const distribusi = await prisma.distribusi.findMany({
+    orderBy: {
+      id_distribusi: 'asc', 
+    },
+  });
   return NextResponse.json(distribusi, {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
@@ -79,25 +83,64 @@ export async function POST(request: NextRequest) {
 
 
 export async function PATCH(request: NextRequest) {
-  const body = await request.json();
-  const { id_distribusi, id_obat, nama_obat, stok, kategori, tujuan, tgl_distribusi } = body;
+  try {
+    const body = await request.json();
+    const { id_distribusi, id_obat, nama_obat, stok, kategori, tujuan, tgl_distribusi } = body;
 
-  const updateDataDistribusi = await prisma.distribusi.update({
-    where: { id_distribusi },
-    data: {
-      id_obat,
-      nama_obat,
-      stok: parseInt(stok),
-      kategori,
-      tgl_distribusi: new Date(tgl_distribusi),
-      tujuan,
+    const jumlahBaru = parseInt(stok);
+
+    // Ambil data distribusi lama
+    const distribusiLama = await prisma.distribusi.findUnique({
+      where: { id_distribusi },
+    });
+
+    if (!distribusiLama) {
+      return NextResponse.json({ error: "Data distribusi tidak ditemukan." }, { status: 404 });
     }
-  });
 
-  return NextResponse.json(updateDataDistribusi, {
-    status: 200,
-  });
+    const obat = await prisma.obat.findUnique({
+      where: { id_obat },
+    });
+
+    if (!obat) {
+      return NextResponse.json({ error: "Obat tidak ditemukan." }, { status: 404 });
+    }
+
+    if (obat.stok < jumlahBaru) {
+      return NextResponse.json({ error: "Stok obat tidak mencukupi." }, { status: 400 });
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      // Kurangi stok obat dengan stok yang baru ditambahkan
+      await tx.obat.update({
+        where: { id_obat },
+        data: {
+          stok: obat.stok - jumlahBaru,
+        },
+      });
+
+      // Tambahkan stok distribusi lama dengan yang baru
+      const distribusiUpdate = await tx.distribusi.update({
+        where: { id_distribusi },
+        data: {
+          stok: distribusiLama.stok + jumlahBaru,
+          nama_obat,
+          kategori,
+          tujuan,
+          tgl_distribusi: new Date(tgl_distribusi),
+        },
+      });
+
+      return distribusiUpdate;
+    });
+
+    return NextResponse.json(updated, { status: 200 });
+  } catch (error) {
+    console.error("Gagal update distribusi:", error);
+    return NextResponse.json({ error: "Terjadi kesalahan saat update" }, { status: 500 });
+  }
 }
+
 
 export async function DELETE(request: NextRequest) {
   try {
