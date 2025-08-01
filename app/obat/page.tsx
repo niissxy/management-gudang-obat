@@ -89,7 +89,7 @@ export default function Page() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ id: id_obat }),
+      body: JSON.stringify({ id_obat: id_obat }),
     });
 
     const result = await res.json();
