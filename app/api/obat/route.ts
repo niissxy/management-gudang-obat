@@ -91,11 +91,11 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id } = body;
+    const { id_obat } = body;
 
     // Cari obat berdasarkan ID
     const obat = await prisma.obat.findUnique({
-      where: { id_obat: id },
+      where: { id_obat: id_obat },
     });
 
     if (!obat) {
@@ -104,19 +104,19 @@ export async function DELETE(req: NextRequest) {
 
     // Cek apakah obat sudah digunakan di distribusi
     const digunakanDistribusi = await prisma.distribusi.findFirst({
-      where: { id_obat: id },
+      where: { id_obat: id_obat },
     });
 
     const digunakanGudang1 = await prisma.gudang1.findFirst({
-      where: { id_obat: id },
+      where: { id_obat: id_obat },
     });
 
     const digunakanGudang2 = await prisma.gudang2.findFirst({
-      where: { id_obat: id },
+      where: { id_obat: id_obat },
     });
 
     const digunakanGudang3 = await prisma.gudang3.findFirst({
-      where: { id_obat: id },
+      where: { id_obat: id_obat },
     });
 
     if (digunakanDistribusi || digunakanGudang1 || digunakanGudang2 || digunakanGudang3) {
@@ -127,7 +127,7 @@ export async function DELETE(req: NextRequest) {
 
     // Jika belum digunakan, lanjut hapus
     await prisma.obat.delete({
-      where: { id_obat: id },
+      where: { id_obat: id_obat },
     });
 
     return NextResponse.json({ message: "Obat berhasil dihapus." });

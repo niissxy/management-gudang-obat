@@ -20,7 +20,6 @@ export default function Page() {
   const [obatList, setObatList] = useState<Obat[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [obat, setObat] = useState<Obat[]>([]);
   const [editingIdObat, setEditingIdObat] = useState<string | null>(null);
   const [editNamaObat, setEditNamaObat] = useState('');
   const [editStok, setEditStok] = useState('');
