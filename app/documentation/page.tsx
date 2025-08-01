@@ -1,12 +1,23 @@
 'use client'
 
 import Card from '../components/cards'
+import Link from 'next/link'
 
 export default function Docs() {
   return (
     <main className="flex min-h-screen bg-gray-100">
       <div className="ml-0 w-full p-4">
         <Card title="Documentation">
+            <div className="flex justify-end">
+            <Link href="/home">
+            <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            style={{ marginLeft: '100px'}}
+          >
+            Back
+          </button>
+            </Link>
+          </div>
           <hr className="mt-2 border-b-2 border-gray-400 w-362 " />
 
           <section className="py-8 px-4 bg-white">
@@ -93,6 +104,7 @@ export default function Docs() {
                                     Untuk mengirimkan data, tekan tombol "Simpan" dan tombol "Cancel" untuk membatalkan. Jika data
                                     berhasil diedit, data akan otomatis berubah di halaman obat
                                 </li>
+                                <li>Jika update data berhasil, maka stok lama dari data obat akan bertambah berdasarkan stok yang diupdate sebelumnya</li>
                                 <li>Field Id, suplier, kategori tidak bisa di edit</li>
                             </ul>
                         </li>
@@ -207,27 +219,82 @@ export default function Docs() {
                         <li>Edit Data
                             <ul className='list-disc pl-5 text-black'>
                                 <li>
-                                    Untuk memulai edit data, tekan tombol dengan icon pen. Untuk data yang bisa diedit yaitu nama, email, alamat dan no_telp
+                                    Untuk memulai edit data, tekan tombol dengan icon pen. Untuk data yang bisa diedit yaitu stok dan tgl_distribusi
                                 </li>
                                 <li>
                                     Untuk mengirimkan data, tekan tombol "Simpan" dan tombol "Cancel" untuk membatalkan. Jika data
-                                    berhasil diedit, data akan otomatis berubah di halaman suplier
+                                    berhasil diedit, data akan otomatis berubah di halaman distribusi
+                                </li>
+                                <li>
+                                    Saat update data berhasil, maka stok lama yang ada di distribusi akan bertambah berdasarkan stok yang diupdate sebelumnya,
+                                    dan juga akan mengurangi stok di daftar obat berdasarkan stok yang diinput saat edit data
                                 </li>
                             </ul>
                         </li>
                         <li>Hapus Data
                             <ul className='list-disc pl-5 text-black'>
                                 <li>
-                                    Untuk hapus data, tekan tombol dengan icon trash yang ada disebelah kanan tombol edit, jika berhasil data akan terhapus
+                                    Untuk hapus data, tekan tombol dengan icon trash yang ada disebelah kanan tombol edit, jika berhasil data akan terhapus.
+                                    Untuk data distribusi yang sudah digunakan di gudang 1, 2, atau 3, maka tidak akan bisa dihapus
                                 </li>
                             </ul>
                         </li>
                     </ul>
                   </li>
-                  <li>Daftar Gudang 1, 2, dan 3</li>
+
+                  <li>Daftar Gudang 1, 2, 3
+                    <ul className='list-disc pl-5 text-black'>
+                        <li>
+                            Tambah Data
+                            <ul className='list-disc pl-5 text-black'>
+                                <li>
+                                    Untuk menambah data gudang 1, 2 atau 3, tekan tombol "Tambah Data" yang ada di bagian atas tabel untuk mulai menambah data.
+                                    Kemudian, masukkan semua data yang dibutuhkan untuk daftar distribusi didalam field input yang sudah disediakan.
+                                </li>
+                                <li>
+                                    Untuk mengirimkan data, tekan tombol "Tambah" dibagian bawah dan tombol "Cancel" untuk membatalkan. Jika data
+                                    berhasil dikirimkan, akan otomatis berpindah ke halaman daftar gudang 1, 2 atau 3 (sesuai gudang yang sedang aktif)
+                                </li>
+                                 <li>
+                                    Jika berhasil menambah data gudang, maka stok yang ada di daftar distribusi akan berkurang berdasarkan stok yang
+                                    dimasukkan di data gudang
+                                </li>
+                                <li>Id Gudang sudah digenerate secara otomatis</li>
+                            </ul>
+                        </li>
+                        <li>Edit Data
+                            <ul className='list-disc pl-5 text-black'>
+                                <li>
+                                    Untuk memulai edit data, tekan tombol dengan icon pen. Untuk data yang bisa diedit yaitu stok dan tgl_distribusi
+                                </li>
+                                <li>
+                                    Untuk mengirimkan data, tekan tombol "Simpan" dan tombol "Cancel" untuk membatalkan. Jika data
+                                    berhasil diedit, data akan otomatis berubah di halaman gudang
+                                </li>
+                                <li>
+                                    Saat update data berhasil, maka stok lama yang ada di gudang 1, 2, atau 3 akan bertambah berdasarkan stok yang diupdate sebelumnya,
+                                    dan juga akan mengurangi stok di daftar distribusi berdasarkan stok yang diinput saat edit data
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Hapus Data
+                            <ul className='list-disc pl-5 text-black'>
+                                <li>
+                                    Untuk hapus data, tekan tombol dengan icon trash yang ada disebelah kanan tombol edit, jika berhasil data akan terhapus.
+                                </li>
+                                <li>Saat menghapus data, sistem akan mengecek apakah data ada di distribusi atau obat</li>
+                                <li>Jika ada di distribusi, saat data gudang 1, 2, atau 3 dihapus, maka stok yang ada di gudang tersebut akan kembali 
+                                    ke distribusi dan menambah stok di distribusi berdasarkan stok gudang yang dihapus
+                                </li>
+                                 <li>Jika tidak ada di distribusi, saat data gudang 1, 2, atau 3 dihapus, maka stok yang ada di gudang tersebut akan kembali 
+                                    ke data obat dan menambah stok di data obat berdasarkan stok gudang yang dihapus
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                  </li>
                 </ul>
               </div>
-
             </div>
           </section>
         </Card>

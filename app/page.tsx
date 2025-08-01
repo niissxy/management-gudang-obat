@@ -25,10 +25,19 @@ export default function Page() {
               Kelola stok obat dengan mudah, cepat, dan akurat. Cocok untuk rumah sakit, apotek, atau gudang farmasi.
             </p>
 
-            <Link href='/login'>
-             <button className="bg-blue-500 text-white px-3 py-2 rounded mb-6" style={{ width: '200px', marginTop: '35px' }}>
-              Mulai
-            </button></Link>
+           <div className="flex gap-4 mt-6">
+            <Link href="/login">
+              <button className="bg-blue-500 text-white px-3 py-2 rounded" style={{ width: '200px' }}>
+                Mulai
+              </button>
+            </Link>
+
+            <Link href="/documentation">
+              <button className="bg-blue-500 text-white px-4 py-2 rounded">
+                View Documentation
+              </button>
+              </Link>
+            </div>
           </div>
         </div>
       </Card>
