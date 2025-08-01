@@ -82,6 +82,25 @@ export default function Page() {
   setEditingIdDistribusi(null);
 };
 
+ const handleDelete = async (id_distribusi: string) => {
+    const res = await fetch("/api/distribusi", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id: id_distribusi }),
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      // Hapus dari state tanpa refresh
+      setDistribusiList(prev => prev.filter(item => item.id_distribusi !== id_distribusi));
+    } else {
+      alert(result.error || "Gagal menghapus");
+    }
+  };
+
   return (
     <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
@@ -192,7 +211,7 @@ export default function Page() {
                       <td>{d.nama_obat}</td>
                       <td>{d.stok}</td>
                       <td>{d.kategori}</td>
-                      <td>{d.tgl_distribusi}</td>
+                      <td>{d.tgl_distribusi.slice(0,10)}</td>
                       <td>{d.tujuan}</td>
                       <td colSpan={2}>
                         <div className="flex justify-center gap-2">
@@ -203,7 +222,7 @@ export default function Page() {
                             <Pen size={18} />
                           </button>
                           <button
-                            onClick={() => deleteBarang(o.id_obat)}
+                            onClick={() => handleDelete(d.id_distribusi)}
                             className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2"
                           >
                             <TrashIcon size={18} />

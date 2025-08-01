@@ -78,6 +78,25 @@ export default function Page() {
   setEditingIdGudang2(null);
 };
 
+const handleDelete = async (id_gudang: string) => {
+    const res = await fetch("/api/gudang/2", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id_gudang: id_gudang }),
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      // Hapus dari state tanpa refresh
+      setGudang2List(prev => prev.filter(item => item.id_gudang !== id_gudang));
+    } else {
+      alert(result.error || "Gagal menghapus");
+    }
+  };
+
   return (
     <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
@@ -191,7 +210,7 @@ export default function Page() {
                             <Pen size={18} />
                           </button>
                           <button
-                            onClick={() => deleteBarang(o.id_obat)}
+                            onClick={() => handleDelete(g2.id_gudang)}
                             className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2"
                           >
                             <TrashIcon size={18} />

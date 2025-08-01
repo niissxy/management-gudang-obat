@@ -133,19 +133,51 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { id_gudang } = body;
 
-    // Pastikan ID ada
     if (!id_gudang) {
-      return NextResponse.json({ error: 'ID wajib diisi' }, { status: 400 });
+      return NextResponse.json({ error: "ID wajib diisi" }, { status: 400 });
     }
 
-    // Hapus data secara permanen
-    await prisma.gudang1.delete({
-      where: { id_gudang: String(id_gudang) },
+    // Ambil data gudang dulu
+    const dataGudang = await prisma.gudang3.findUnique({
+      where: { id_gudang },
     });
 
-    return NextResponse.json({ message: 'Data Gudang 3 berhasil dihapus' }, { status: 200 });
+    if (!dataGudang) {
+      return NextResponse.json({ error: "Data gudang tidak ditemukan" }, { status: 404 });
+    }
+
+    const { id_obat, stok, id_distribusi } = dataGudang;
+
+    // Hapus data gudang
+    await prisma.gudang3.delete({
+      where: { id_gudang },
+    });
+
+    // Coba kembalikan stok ke distribusi dulu (berdasarkan id_distribusi)
+    if (id_distribusi) {
+      await prisma.distribusi.update({
+        where: { id_distribusi },
+        data: {
+          stok: {
+            increment: stok,
+          },
+        },
+      });
+    } else {
+      // Kalau tidak ada id_distribusi, kembalikan ke obat
+      await prisma.obat.update({
+        where: { id_obat },
+        data: {
+          stok: {
+            increment: stok,
+          },
+        },
+      });
+    }
+
+    return NextResponse.json({ message: "Data Gudang 3 berhasil dihapus dan stok dikembalikan" }, { status: 200 });
   } catch (error) {
-    console.error('Gagal menghapus data gudang 3:', error);
-    return NextResponse.json({ error: 'Terjadi kesalahan saat menghapus' }, { status: 500 });
+    console.error("Gagal menghapus data gudang 3:", error);
+    return NextResponse.json({ error: "Terjadi kesalahan saat menghapus" }, { status: 500 });
   }
 }

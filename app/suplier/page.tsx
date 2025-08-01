@@ -74,6 +74,25 @@ export default function Page() {
   setEditingIdSuplier(null);
 };
 
+const handleDelete = async (id_suplier: string) => {
+    const res = await fetch("/api/suplier", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id_suplier: id_suplier }),
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      // Hapus dari state tanpa refresh
+      setSuplierList(prev => prev.filter(item => item.id_suplier !== id_suplier));
+    } else {
+      alert(result.error || "Gagal menghapus");
+    }
+  };
+
   return (
     <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
@@ -174,7 +193,7 @@ export default function Page() {
                             <Pen size={18} />
                           </button>
                           <button
-                            onClick={() => deleteBarang(o.id_obat)}
+                            onClick={() => handleDelete(s.id_suplier)}
                             className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2"
                           >
                             <TrashIcon size={18} />

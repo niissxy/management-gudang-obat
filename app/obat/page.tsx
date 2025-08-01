@@ -101,6 +101,7 @@ export default function Page() {
       alert(result.error || "Gagal menghapus");
     }
   };
+  
   return (
     <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
