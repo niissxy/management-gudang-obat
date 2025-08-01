@@ -101,7 +101,7 @@ export default function Page() {
       alert(result.error || "Gagal menghapus");
     }
   };
-  
+
   return (
     <main className="flex min-h-screen bg-gray-100">
       {/* Sidebar tetap di kiri */}
@@ -148,7 +148,6 @@ export default function Page() {
                       className="border p-2 mr-2"
                       style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}
                       value={editNamaObat} 
-                      readOnly={true}
                       onChange={(e) => setEditNamaObat(e.target.value)} /></td>
                       
                       <td><input 
@@ -175,7 +174,6 @@ export default function Page() {
                       className="border p-2 mr-2"
                       style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '100px' }}     
                       value={editHarga}
-                      readOnly={true} 
                       onChange={(e) => setEditHarga(e.target.value)} /></td>
 
                       <td><input     

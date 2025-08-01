@@ -34,6 +34,7 @@ const Card: React.FC<CardProps> = ({ title, children }) => {
           margin: 0 0 16px 0;
           font-size: 1.5rem;
           color: black;
+          font-weight: 600;
         }
       `}</style>
     </div>
