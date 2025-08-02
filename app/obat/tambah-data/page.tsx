@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import Alert from "@/app/components/Alert";
 
 
 interface Obat {
@@ -17,6 +18,7 @@ interface Obat {
 }
 
 export default function TambahDataObat() {
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [listSuplier, setListSuplier] = useState<string[]>([]);
   const [listKategori, setListKategori] = useState<string[]>([]);
 
@@ -63,18 +65,25 @@ export default function TambahDataObat() {
   });
 
   if (response.ok) {
+  setAlert({ message: "Berhasil menambah data!", type: "success" });
+
+  // Tambahkan delay sebelum pindah halaman
+  setTimeout(() => {
     router.push('/obat');
-  } else {
-    const err = await response.json();
-    console.error('Gagal menambahkan data:', err);
-    alert('Gagal menambahkan data: ' + (err.error || ''));
-  }
+  }, 1500); // 1.5 detik, bisa kamu ubah
+} else {
+  const err = await response.json();
+  console.error('Gagal menambahkan data:', err);
+  setAlert({ message: "Gagal menambah data!", type: "error" });
+}
+
 };
 
 
   return (
     <main className="flex min-h-screen bg-gray-100">
       <Card title="Tambah Data Obat">
+         {alert && <Alert message={alert.message} type={alert.type} />}
         <div>
           <p className="text-black my-2">Nama Obat</p>
           <input
