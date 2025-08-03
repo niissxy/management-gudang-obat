@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Alert from "@/app/components/Alert";
 
 export default function TambahDataGudang1() {
   interface Distribusi {
@@ -91,6 +92,7 @@ export default function TambahDataGudang1() {
   return (
     <main className="flex min-h-screen bg-gray-100">
       <Card title="Tambah Data Gudang 3">
+        {alert && <Alert message={alert.message} type={alert.type} />}
         <div>
           <p className="text-black my-2">ID Distribusi (tujuan: gudang 3)</p>
           <select
