@@ -12,6 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
+  UserIcon
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 
@@ -91,6 +92,13 @@ export default function Sidebar() {
                 </li>
               </ul>
             )}
+          </li>
+
+          <li style={{ marginTop: '20px' }}>
+            <Link href="/user" className="flex items-center space-x-2 hover:text-gray-300">
+              <UserIcon size={18} />
+              <span style={{ marginLeft: '9px' }}>User</span>
+            </Link>
           </li>
 
           <li>
