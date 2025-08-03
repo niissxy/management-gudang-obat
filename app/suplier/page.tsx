@@ -5,6 +5,7 @@ import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Pen, TrashIcon } from "lucide-react";
+import Alert from "../components/Alert";
 
 export default function Page() {
   interface Suplier {
@@ -18,6 +19,7 @@ export default function Page() {
     const [suplierList, setSuplierList] = useState<Suplier[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [editingIdSuplier, setEditingIdSuplier] = useState<string | null>(null);
     const [editNamaSuplier, setEditNamaSuplier] = useState('');
     const [editEmailSuplier, setEditEmailSuplier] = useState('');
@@ -63,11 +65,13 @@ export default function Page() {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    alert(errorData.error || "Gagal update data");
-    return;
-  }
+ if (response.ok) {
+     setAlert({ message: "Berhasil update data!", type: "success" });
+   } else {
+     const err = await response.json();
+     console.error('Gagal update data:', err);
+     setAlert({ message: "Gagal update data!", type: "error" });
+   }
 
   const updated = await response.json();
   setSuplierList(prev => prev.map(s => s.id_suplier === editingIdSuplier ? updated : s));
@@ -75,6 +79,9 @@ export default function Page() {
 };
 
 const handleDelete = async (id_suplier: string) => {
+  const confirmDelete = window.confirm("Apakah yakin ingin menghapus data ini?");
+  if (!confirmDelete) return;
+  
     const res = await fetch("/api/suplier", {
       method: "DELETE",
       headers: {
@@ -86,11 +93,19 @@ const handleDelete = async (id_suplier: string) => {
     const result = await res.json();
 
     if (res.ok) {
-      // Hapus dari state tanpa refresh
-      setSuplierList(prev => prev.filter(item => item.id_suplier !== id_suplier));
-    } else {
-      alert(result.error || "Gagal menghapus");
-    }
+    setSuplierList(prev => prev.filter(item => item.id_suplier !== id_suplier));
+    setAlert({ message: "Berhasil menghapus data!", type: "success" });
+  } else {
+    setAlert({ message: result.error || "Gagal menghapus data!", type: "error" });
+  }
+
+  useEffect(() => {
+  if (alert) {
+    const timer = setTimeout(() => setAlert(null), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [alert]);
+
   };
 
   return (
@@ -101,6 +116,7 @@ const handleDelete = async (id_suplier: string) => {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Daftar Suplier">
+          {alert && <Alert message={alert.message} type={alert.type} />}
           <div className="mb-4">
           </div>
           <div className="flex justify-end">

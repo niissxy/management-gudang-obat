@@ -5,6 +5,7 @@ import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Pen, TrashIcon } from "lucide-react";
+import Alert from "../components/Alert";
 
 export default function Page() {
   interface Distribusi {
@@ -20,6 +21,7 @@ export default function Page() {
     const [distribusiList, setDistribusiList] = useState<Distribusi[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [editingIdDistribusi, setEditingIdDistribusi] = useState<string | null>(null);
     const [editIdObat, setEditIdObat] = useState('');
     const [editNamaObat, setEditNamaObat] = useState('');
@@ -71,11 +73,14 @@ export default function Page() {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    alert(errorData.error || "Gagal update data");
-    return;
-  }
+  
+    if (response.ok) {
+     setAlert({ message: "Berhasil update data!", type: "success" });
+   } else {
+     const err = await response.json();
+     console.error('Gagal update data:', err);
+     setAlert({ message: "Gagal update data!", type: "error" });
+   }
 
   const updated = await response.json();
   setDistribusiList(prev => prev.map(d => d.id_distribusi === editingIdDistribusi ? updated : d));
@@ -83,23 +88,34 @@ export default function Page() {
 };
 
  const handleDelete = async (id_distribusi: string) => {
-    const res = await fetch("/api/distribusi", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ id: id_distribusi }),
-    });
+  const confirmDelete = window.confirm("Apakah yakin ingin menghapus data ini?");
+  if (!confirmDelete) return;
 
-    const result = await res.json();
+  const res = await fetch("/api/distribusi", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ id: id_distribusi }),
+  });
 
-    if (res.ok) {
-      // Hapus dari state tanpa refresh
-      setDistribusiList(prev => prev.filter(item => item.id_distribusi !== id_distribusi));
-    } else {
-      alert(result.error || "Gagal menghapus");
-    }
-  };
+  const result = await res.json();
+
+  if (res.ok) {
+    setDistribusiList(prev => prev.filter(item => item.id_distribusi !== id_distribusi));
+    setAlert({ message: "Berhasil menghapus data!", type: "success" });
+  } else {
+    setAlert({ message: result.error || "Gagal menghapus data!", type: "error" });
+  }
+
+  useEffect(() => {
+  if (alert) {
+    const timer = setTimeout(() => setAlert(null), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [alert]);
+
+};
 
   return (
     <main className="flex min-h-screen bg-gray-100">
@@ -109,6 +125,7 @@ export default function Page() {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Distribusi Obat">
+          {alert && <Alert message={alert.message} type={alert.type} />}
           <div className="mb-4">  
           </div>
           <div className="flex justify-end">

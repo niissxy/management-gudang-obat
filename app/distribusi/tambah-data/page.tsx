@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Alert from "@/app/components/Alert";
 
 export default function TambahDataDistribusi() {
   interface Distribusi {
@@ -25,6 +26,7 @@ export default function TambahDataDistribusi() {
     // const [listSuplier, setListSuplier] = useState<string[]>([]);
     // const [listKategori, setListKategori] = useState<string[]>([]);
   
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [distribusi, setDistribusi] = useState<Distribusi[]>([]);
     const [obatList, setObatList] = useState<Obat[]>([]);
     const [id_obat, setIdObat] = useState('');
@@ -69,17 +71,23 @@ export default function TambahDataDistribusi() {
     });
   
     if (response.ok) {
-      router.push('/distribusi');
-    } else {
-      const err = await response.json();
-      console.error('Gagal menambahkan data:', err);
-      alert('Gagal menambahkan data: ' + (err.error || ''));
-    }
+     setAlert({ message: "Berhasil menambah data!", type: "success" });
+   
+     // Tambahkan delay sebelum pindah halaman
+     setTimeout(() => {
+       router.push('/distribusi');
+     }, 1500); // 1.5 detik, bisa kamu ubah
+   } else {
+     const err = await response.json();
+     console.error('Gagal menambahkan data:', err);
+     setAlert({ message: "Gagal menambah data!", type: "error" });
+   }
   };
 
   return (
     <main className="flex min-h-screen bg-gray-100">
       <Card title="Tambah Data Distribusi Obat">
+        {alert && <Alert message={alert.message} type={alert.type} />}
         <div>
           <p className="text-black my-2">Id Obat</p>
           <select
@@ -146,6 +154,7 @@ export default function TambahDataDistribusi() {
             value={tujuan}
             onChange={(e) => setTujuan(e.target.value)}
           >
+             <option value="">-- Pilih Gudang --</option>
             <option value='gudang 1'>gudang 1</option>
             <option value='gudang 2'>gudang 2</option>
             <option value='gudang 3'>gudang 3</option>

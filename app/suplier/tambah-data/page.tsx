@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Alert from "@/app/components/Alert";
 
 export default function TambahDataSuplier() {
   interface Suplier {
@@ -14,6 +15,7 @@ export default function TambahDataSuplier() {
     no_telp: string;
   }
   
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [suplier, setSuplier] = useState<Suplier[]>([]);
     const [nama_suplier, setNamaSuplier] = useState('');
     const [email_suplier, setEmailSuplier] = useState('');
@@ -36,18 +38,24 @@ export default function TambahDataSuplier() {
       body: JSON.stringify({ nama_suplier, email_suplier, alamat_suplier, no_telp }),
     });
   
-    if (response.ok) {
-      router.push('/suplier');
-    } else {
-      const err = await response.json();
-      console.error('Gagal menambahkan data:', err);
-      alert('Gagal menambahkan data: ' + (err.error || ''));
-    }
+  if (response.ok) {
+  setAlert({ message: "Berhasil menambah data!", type: "success" });
+
+  // Tambahkan delay sebelum pindah halaman
+  setTimeout(() => {
+    router.push('/suplier');
+  }, 1500); // 1.5 detik, bisa kamu ubah
+} else {
+  const err = await response.json();
+  console.error('Gagal menambahkan data:', err);
+  setAlert({ message: "Gagal menambah data!", type: "error" });
+}
   };
 
   return (
     <main className="flex min-h-screen bg-gray-100">
       <Card title="Tambah Data Suplier">
+        {alert && <Alert message={alert.message} type={alert.type} />}
         <div>
           <p className="text-black my-2">Nama Suplier</p>
           <input

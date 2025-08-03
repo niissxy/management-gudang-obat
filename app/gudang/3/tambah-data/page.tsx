@@ -142,7 +142,7 @@ export default function TambahDataGudang1() {
             type="number"
             className="border p-2"
             style={{ width: '500px', border: '1px solid grey', borderRadius: '5px', color: 'black' }}
-            placeholder="Masukkan stok untuk gudang 1..."
+            placeholder="Masukkan stok untuk gudang 3..."
             value={stok}
             onChange={(e) => setStok(e.target.value)}
             min={1}

@@ -5,6 +5,7 @@ import Card from "../components/cards";
 import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { Pen, TrashIcon } from "lucide-react";
+import Alert from "../components/Alert";
 
 interface Obat {
   id_obat: string;
@@ -20,6 +21,7 @@ export default function Page() {
   const [obatList, setObatList] = useState<Obat[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [editingIdObat, setEditingIdObat] = useState<string | null>(null);
   const [editNamaObat, setEditNamaObat] = useState('');
   const [editStok, setEditStok] = useState('');
@@ -71,11 +73,13 @@ export default function Page() {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    alert(errorData.error || "Gagal update data");
-    return;
-  }
+  if (response.ok) {
+     setAlert({ message: "Berhasil update data!", type: "success" });
+   } else {
+     const err = await response.json();
+     console.error('Gagal update data:', err);
+     setAlert({ message: "Gagal update data!", type: "error" });
+   }
 
   const updated = await response.json();
   setObatList(prev => prev.map(o => o.id_obat === editingIdObat ? updated : o));
@@ -83,6 +87,9 @@ export default function Page() {
 };
 
  const handleDelete = async (id_obat: string) => {
+  const confirmDelete = window.confirm("Apakah yakin ingin menghapus data ini?");
+  if (!confirmDelete) return;
+  
     const res = await fetch("/api/obat", {
       method: "DELETE",
       headers: {
@@ -93,12 +100,20 @@ export default function Page() {
 
     const result = await res.json();
 
-    if (res.ok) {
-      // Hapus dari state tanpa refresh
-      setObatList(prev => prev.filter(item => item.id_obat !== id_obat));
-    } else {
-      alert(result.error || "Gagal menghapus");
-    }
+  if (res.ok) {
+    setObatList(prev => prev.filter(item => item.id_obat !== id_obat));
+    setAlert({ message: "Berhasil menghapus data!", type: "success" });
+  } else {
+    setAlert({ message: result.error || "Gagal menghapus data!", type: "error" });
+  }
+
+  useEffect(() => {
+  if (alert) {
+    const timer = setTimeout(() => setAlert(null), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [alert]);
+
   };
 
   return (
@@ -109,6 +124,7 @@ export default function Page() {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Daftar Obat">
+          {alert && <Alert message={alert.message} type={alert.type} />}
           <div className="flex justify-end mb-4">
             <Link href="/obat/tambah-data">
               <button

@@ -5,6 +5,7 @@ import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Pen, TrashIcon } from "lucide-react";
+import Alert from "@/app/components/Alert";
 
 export default function Page() {
   interface Gudang3 {
@@ -19,6 +20,7 @@ export default function Page() {
   const [gudang3List, setGudang3List] = useState<Gudang3[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [editingIdGudang3, setEditingIdGudang3] = useState<string | null>(null);
   const [editIdDistribusi, setEditIdDistribusi] = useState('');
   const [editIdObat, setEditIdObat] = useState('');
@@ -67,11 +69,13 @@ export default function Page() {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    alert(errorData.error || "Gagal update data");
-    return;
-  }
+  if (response.ok) {
+     setAlert({ message: "Berhasil update data!", type: "success" });
+   } else {
+     const err = await response.json();
+     console.error('Gagal update data:', err);
+     setAlert({ message: "Gagal update data!", type: "error" });
+   }
 
   const updated = await response.json();
   setGudang3List(prev => prev.map(g3 => g3.id_gudang === editingIdGudang3 ? updated : g3));
@@ -79,6 +83,9 @@ export default function Page() {
 };
 
 const handleDelete = async (id_gudang: string) => {
+  const confirmDelete = window.confirm("Apakah yakin ingin menghapus data ini?");
+  if (!confirmDelete) return;
+  
     const res = await fetch("/api/gudang/3", {
       method: "DELETE",
       headers: {
@@ -90,11 +97,19 @@ const handleDelete = async (id_gudang: string) => {
     const result = await res.json();
 
     if (res.ok) {
-      // Hapus dari state tanpa refresh
-      setGudang3List(prev => prev.filter(item => item.id_gudang !== id_gudang));
-    } else {
-      alert(result.error || "Gagal menghapus");
-    }
+    setGudang3List(prev => prev.filter(item => item.id_gudang !== id_gudang));
+    setAlert({ message: "Berhasil menghapus data!", type: "success" });
+  } else {
+    setAlert({ message: result.error || "Gagal menghapus data!", type: "error" });
+  }
+
+  useEffect(() => {
+  if (alert) {
+    const timer = setTimeout(() => setAlert(null), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [alert]);
+
   };
 
   return (
@@ -105,6 +120,7 @@ const handleDelete = async (id_gudang: string) => {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Gudang 3">
+          {alert && <Alert message={alert.message} type={alert.type} />}
           <div className="mb-4">
           </div>
           <div className="flex justify-end">

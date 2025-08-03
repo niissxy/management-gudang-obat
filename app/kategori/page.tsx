@@ -5,6 +5,7 @@ import Sidebar from "@/app/components/Sidebar";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Pen } from "lucide-react";
+import Alert from "../components/Alert";
 
 export default function Page() {
   interface Kategori {
@@ -15,6 +16,7 @@ export default function Page() {
       const [kategoriList, setKategoriList] = useState<Kategori[]>([]);
       const [loading, setLoading] = useState(true);
     
+      const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
       const [editingIdKategori, setEditingIdKategori] = useState<string | null>(null);
       const [editNamaKategori, setEditNamaKategori] = useState('');
 
@@ -51,11 +53,13 @@ export default function Page() {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    alert(errorData.error || "Gagal update data");
-    return;
-  }
+  if (response.ok) {
+     setAlert({ message: "Berhasil update data!", type: "success" });
+   } else {
+     const err = await response.json();
+     console.error('Gagal update data:', err);
+     setAlert({ message: "Gagal update data!", type: "error" });
+   }
 
   const updated = await response.json();
   setKategoriList(prev => prev.map(k => k.id_kategori === editingIdKategori ? updated : k));
@@ -70,6 +74,7 @@ export default function Page() {
       {/* Konten card di kanan sidebar */}
       <div className="ml-64 w-full p-4">
         <Card title="Daftar Kategori Obat">
+          {alert && <Alert message={alert.message} type={alert.type} />}
           <div className="flex justify-end">
             <Link href="/kategori/tambah-data">
             <button
