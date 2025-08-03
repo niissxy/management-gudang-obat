@@ -4,13 +4,14 @@ import Card from "@/app/components/cards";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Alert from "@/app/components/Alert";
 
 export default function TambahDataKategori() {
   interface Kategori {
       id_kategori: string;
       nama_kategori: string;
     }
-    
+      const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
       const [kategori, setKategori] = useState<Kategori[]>([]);
       const [nama_kategori, setNamaKategori] = useState('');
     
@@ -30,18 +31,24 @@ export default function TambahDataKategori() {
         body: JSON.stringify({ nama_kategori }),
       });
     
-      if (response.ok) {
-        router.push('/kategori'); 
-      } else {
-        const err = await response.json();
-        console.error('Gagal menambahkan data:', err);
-        alert('Gagal menambahkan data: ' + (err.error || ''));
-      }
+  if (response.ok) {
+  setAlert({ message: "Berhasil menambah data!", type: "success" });
+
+  // Tambahkan delay sebelum pindah halaman
+  setTimeout(() => {
+    router.push('/kategori');
+  }, 1500); // 1.5 detik, bisa kamu ubah
+} else {
+  const err = await response.json();
+  console.error('Gagal menambahkan data:', err);
+  setAlert({ message: "Gagal menambah data!", type: "error" });
+}
     };
 
   return (
     <main className="flex min-h-screen bg-gray-100">
       <Card title="Tambah Data Kategori">
+        {alert && <Alert message={alert.message} type={alert.type} />}
         <div>
            <p className="text-black my-2">Nama Kategori</p>
           <input

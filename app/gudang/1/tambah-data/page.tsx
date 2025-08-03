@@ -4,6 +4,7 @@ import Card from "@/app/components/cards";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Alert from "@/app/components/Alert";
 
 export default function TambahDataGudang1() {
   interface Distribusi {
@@ -24,6 +25,7 @@ export default function TambahDataGudang1() {
     kategori: string;
   }
 
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [distribusiList, setDistribusiList] = useState<Distribusi[]>([]);
   const [gudang1, setGudang1] = useState<Gudang1[]>([]);
 
@@ -67,28 +69,30 @@ export default function TambahDataGudang1() {
   };
 
   const addDataGudang1 = async () => {
-    if (!id_distribusi || !id_obat || !stok) {
-      alert('ID distribusi, ID obat, dan stok wajib diisi');
-      return;
-    }
     const response = await fetch('/api/gudang/1', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id_distribusi, id_obat, stok: parseInt(stok), nama_obat, kategori }),
     });
 
-    if (response.ok) {
-      router.push('/gudang/1');
-    } else {
-      const err = await response.json();
-      alert('Gagal menambahkan data: ' + (err.error || ''));
-      console.error('Gagal menambahkan data:', err);
-    }
-  };
-
-  return (
-    <main className="flex min-h-screen bg-gray-100">
+   if (response.ok) {
+     setAlert({ message: "Berhasil menambah data!", type: "success" });
+   
+     // Tambahkan delay sebelum pindah halaman
+     setTimeout(() => {
+       router.push('/gudang/1');
+     }, 1500); // 1.5 detik, bisa kamu ubah
+   } else {
+     const err = await response.json();
+     console.error('Gagal menambahkan data:', err);
+     setAlert({ message: "Gagal menambah data!", type: "error" });
+   }
+};
+   
+     return (
+       <main className="flex min-h-screen bg-gray-100">
       <Card title="Tambah Data Gudang 1">
+      {alert && <Alert message={alert.message} type={alert.type} />}
         <div>
           <p className="text-black my-2">ID Distribusi (tujuan: gudang 1)</p>
           <select

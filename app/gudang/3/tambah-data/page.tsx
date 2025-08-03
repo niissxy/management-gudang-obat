@@ -24,6 +24,7 @@ export default function TambahDataGudang1() {
     kategori: string;
   }
 
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [distribusiList, setDistribusiList] = useState<Distribusi[]>([]);
   const [gudang3, setGudang3] = useState<Gudang3[]>([]);
 
@@ -67,10 +68,6 @@ export default function TambahDataGudang1() {
   };
 
   const addDataGudang3 = async () => {
-    if (!id_distribusi || !id_obat || !stok) {
-      alert('ID distribusi, ID obat, dan stok wajib diisi');
-      return;
-    }
     const response = await fetch('/api/gudang/3', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -78,12 +75,17 @@ export default function TambahDataGudang1() {
     });
 
     if (response.ok) {
-      router.push('/gudang/3');
-    } else {
-      const err = await response.json();
-      alert('Gagal menambahkan data: ' + (err.error || ''));
-      console.error('Gagal menambahkan data:', err);
-    }
+     setAlert({ message: "Berhasil menambah data!", type: "success" });
+   
+     // Tambahkan delay sebelum pindah halaman
+     setTimeout(() => {
+       router.push('/gudang/3');
+     }, 1500); // 1.5 detik, bisa kamu ubah
+   } else {
+     const err = await response.json();
+     console.error('Gagal menambahkan data:', err);
+     setAlert({ message: "Gagal menambah data!", type: "error" });
+   }
   };
 
   return (
