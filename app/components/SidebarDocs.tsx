@@ -9,7 +9,8 @@ import { FileText,
         Layers,
         TruckIcon,
         Package,
-        Warehouse
+        Warehouse,
+        ArrowLeft
     } 
 from 'lucide-react';
 
@@ -71,7 +72,14 @@ export default function SidebarDocs() {
           <li style={{ marginTop: '20px' }}>
              <Link href="/documentation/crud-gudang" className="flex items-center space-x-2 hover:text-gray-300">
               <Warehouse size={18} />
-              <span style={{ marginLeft: '11px' }}>CRUD Gudang (1, 2,dan 3)</span>
+              <span style={{ marginLeft: '11px' }}>CRUD Gudang (1, 2, dan 3)</span>
+            </Link>
+          </li>
+
+          <li style={{ marginTop: '20px' }}>
+             <Link href="/home" className="flex items-center space-x-2 hover:text-gray-300">
+              <ArrowLeft size={18} />
+              <span style={{ marginLeft: '11px' }}>Back</span>
             </Link>
           </li>
 

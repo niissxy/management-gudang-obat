@@ -140,13 +140,16 @@ export default function TambahDataDistribusi() {
         </div>
          <div style={{ marginTop: '10px' }}>
           <p className="text-black my-2">Tujuan</p>
-          <input
-            className="border p-2 mr-2"
-            style={{ border: '1px solid grey', color: 'black', borderRadius: '5px', width: '500px' }}
-            placeholder="masukkan tujuan..."
+          <select
+            className="border p-2"
+            style={{ width: '500px', border: '1px solid grey', borderRadius: '5px', color: 'black' }}
             value={tujuan}
             onChange={(e) => setTujuan(e.target.value)}
-          />
+          >
+            <option value='gudang 1'>gudang 1</option>
+            <option value='gudang 2'>gudang 2</option>
+            <option value='gudang 3'>gudang 3</option>
+          </select>
         </div>
         <div className="flex justify-end" style={{ marginTop: '10px' }}>
             <Link href="/distribusi">
